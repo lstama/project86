@@ -13,5 +13,6 @@ class VerifyCsrfToken extends BaseVerifier
      */
     protected $except = [
         'sos_handler',
+		'login_handler',
     ];
 }

@@ -20,3 +20,4 @@ Auth::routes();
 Route::get('/home', 'HomeController@index');
 
 Route::post('/sos_handler', 'SOSController@handleSOSRequest');
+Route::post('/login_handler', 'SOSController@checkLoginMobileRequest');

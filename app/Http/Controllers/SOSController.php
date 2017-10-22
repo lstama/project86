@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Mockery\Exception;
-use Illuminate\Support\Facades\DB;
+# use Illuminate\Support\Facades\DB;
 use App\SOS;
 use App\User;
 
@@ -17,6 +17,31 @@ class SOSController extends Controller
 
 	public function handleSOSRequest(Request $request)
 	{
+		$this->getRequest($request);
+
+		if ($this->isAuthorizedRequest()) {
+			if ($this->isValidLocation()) {
+				$this->saveSOS();
+				return;
+			}
+		}
+		echo 0;
+	}
+
+	public function checkLoginMobileRequest(Request $request)
+	{
+		$this->getRequest($request);
+
+		if ($this->isAuthorizedRequest()) {
+			echo '1';
+		}
+		else {
+			echo '0';
+		}
+	}
+
+	public function getRequest(Request $request)
+	{
 		try {
 			$this->email = $request->input('email');
 			$this->hashed_password = $request->input('hashed_password');
@@ -26,19 +51,14 @@ class SOSController extends Controller
 		catch(Exception $e) {
 			return;
 		}
-
-
-		if ($this->isAuthorizedRequest()) {
-			if ($this->isValidLocation()) {
-				$this->saveSOS();
-			}
-		}
 	}
 
-	private function isAuthorizedRequest() {
+	private function isAuthorizedRequest()
+	{
 		#$user = DB::table('users')->where('email', $this->email)->first();
 		$user = User::where('email', $this->email)->first();
 		try {
+			if (is_null($user)) return false;
 			if ($user->hashed_password == $this->hashed_password) {
 				return true;
 			}
@@ -49,16 +69,21 @@ class SOSController extends Controller
 		return false;
 	}
 
-	private function isValidLocation() {
-		$latitude_result = preg_match('/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/', $this->latitude);
-		$longitude_result = preg_match('/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/', $this->longitude);
-		if ($latitude_result == 1 && $longitude_result == 1) {
-			return true;
+	private function isValidLocation()
+	{
+		if (is_numeric($this->latitude) && is_numeric($this->longitude)) {
+			if ($this->latitude >= -90 && $this->latitude <= 90) {
+				if ($this->longitude >= -180 && $this->longitude <= 180) {
+					return true;
+				}
+			}
 		}
+
 		return false;
 	}
 
-	private function saveSOS() {
+	private function saveSOS()
+	{
 		try {
 //			DB::table('SOS')->insert(
 //				[
@@ -77,8 +102,11 @@ class SOSController extends Controller
 
 		}
 		catch (Exception $e) {
+			echo 0;
 			return;
 		}
+
+		echo 1;
 
 	}
 
