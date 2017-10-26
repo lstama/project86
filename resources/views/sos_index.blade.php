@@ -9,19 +9,13 @@
 
                     <div class="panel-body">
                         <table class="table table-striped table-responsive">
-                            <thead>
-                            <tr>
-                                <th>Email</th>
-                                <th>Latitude</th>
-                                <th>Longitude</th>
-                            </tr>
-                            </thead>
                             <tbody>
                                 @foreach ($sos as $item)
                                     <tr>
                                         <td>{{ $item->email }}</td>
                                         <td>{{ $item->latitude }}</td>
                                         <td>{{ $item->longitude }}</td>
+                                        <td><a href="https://www.google.com/maps/search/?api=1&query={{$item->latitude}},{{ $item->longitude }}" target="_blank">Show on map</a></td>
                                     </tr>
                                 @endforeach
                             </tbody>
