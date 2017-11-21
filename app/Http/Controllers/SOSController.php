@@ -18,8 +18,9 @@ class SOSController extends Controller
 	public function handleSOSRequest(Request $request)
 	{
 		$this->getRequest($request);
-
-		if ($this->isAuthorizedRequest()) {
+		$user = User::where('email', $this->email)->first();
+		http_response_code(200);
+		if ($this->isAuthorizedRequest($user)) {
 			if ($this->isValidLocation()) {
 				$this->saveSOS();
 				return;
@@ -31,12 +32,24 @@ class SOSController extends Controller
 	public function checkLoginMobileRequest(Request $request)
 	{
 		$this->getRequest($request);
+		$user = User::where('email', $this->email)->first();
+		http_response_code(200);
+		header('Content-Type: application/json');
 
-		if ($this->isAuthorizedRequest()) {
-			echo '1';
+
+		if ($this->isAuthorizedRequest($user)) {
+			$fullname = $user->name;
+			$data = [
+				"status" => "1",
+				"fullname" =>$fullname,
+			];
+			echo json_encode($data);
 		}
 		else {
-			echo '0';
+			$data = [
+				"status" => "1",
+			];
+			echo json_encode($data);
 		}
 	}
 
@@ -53,10 +66,10 @@ class SOSController extends Controller
 		}
 	}
 
-	private function isAuthorizedRequest()
+	private function isAuthorizedRequest($user)
 	{
 		#$user = DB::table('users')->where('email', $this->email)->first();
-		$user = User::where('email', $this->email)->first();
+
 		try {
 			if (is_null($user)) return false;
 			if ($user->hashed_password == $this->hashed_password) {
